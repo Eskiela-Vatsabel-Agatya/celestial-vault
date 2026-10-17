@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "celestial-vault",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // Static files come from the Vite build. Only /api/* wakes the Worker.
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "celestial-vault-db",
+      "database_id": "1d12e3e8-bdde-4a2a-b7f3-99de6ee3e385"
+    }
+  ],
+  "observability": { "enabled": true },
+  // Phase 2 adds TURNSTILE_SITE_KEY here.
+  "vars": {}
+}
