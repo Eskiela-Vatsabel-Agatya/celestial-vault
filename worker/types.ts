@@ -12,5 +12,14 @@ export interface Item {
 }
 export interface Inventory { generatedAt: string; categories: Category[]; members: Member[]; items: Item[] }
 
-// Worker-only bindings.
-export interface Env { DB: D1Database }
+// Worker-only bindings. The four secrets are set in the Cloudflare dashboard (type: Secret).
+// Any of them may be undefined if not configured: the code fails closed.
+export interface Env {
+  DB: D1Database;
+  ADMIN_EMAIL?: string;
+  ADMIN_PASSWORD?: string;
+  JWT_SECRET?: string;
+  TURNSTILE_SECRET_KEY?: string;
+  TURNSTILE_SITE_KEY?: string; // public, from wrangler.jsonc vars
+}
+export interface AppEnv { Bindings: Env; Variables: { json: unknown } }

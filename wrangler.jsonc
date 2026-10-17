@@ -16,6 +16,6 @@
     }
   ],
   "observability": { "enabled": true },
-  // Phase 2 adds TURNSTILE_SITE_KEY here.
-  "vars": {}
+  // Public Turnstile site key (not secret). The secrets go in the Cloudflare dashboard, never here.
+  "vars": { "TURNSTILE_SITE_KEY": "0x4AAAAAAFZBGQRih_nEMzX-" }
 }

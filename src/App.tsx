@@ -2,6 +2,9 @@ import { NavLink, Route, Routes } from "react-router-dom";
 import { Star } from "lucide-react";
 import { DataProvider, useInventory } from "./components/DataContext";
 import { relativeTime } from "./lib/format";
+import { EditorProvider, useEditor } from "./components/EditorContext";
+import HeaderAuth from "./components/HeaderAuth";
+import LoginModal from "./components/LoginModal";
 import Explorer from "./pages/Explorer";
 import Members from "./pages/Members";
 import NotFound from "./pages/NotFound";
@@ -22,8 +25,14 @@ function Footer() {
   );
 }
 
+function LoginHost() {
+  const { loginOpen } = useEditor();
+  return loginOpen ? <LoginModal /> : null;
+}
+
 export default function App() {
   return (
+    <EditorProvider>
     <DataProvider>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-[var(--gold)] focus:px-3 focus:py-1 focus:text-black">Skip to content</a>
       <div className="mx-auto max-w-6xl px-4">
@@ -41,8 +50,7 @@ export default function App() {
                 {n.label}
               </NavLink>
             ))}
-            {/* Reserved slot for the Phase 2 "Editor login" button */}
-            <span id="header-right-slot" />
+            <HeaderAuth />
           </nav>
         </header>
         <main id="main">
@@ -54,6 +62,8 @@ export default function App() {
         </main>
         <Footer />
       </div>
+      <LoginHost />
     </DataProvider>
+    </EditorProvider>
   );
 }
