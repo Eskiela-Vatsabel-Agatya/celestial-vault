@@ -1,6 +1,8 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { Star } from "lucide-react";
-import { DataProvider, useInventory } from "./components/DataContext";
+import { DataProvider } from "./components/DataContext";
+import { RecentProvider, useRecent } from "./components/RecentContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { EditorProvider, useEditor } from "./components/EditorContext";
 import { AdminProvider } from "./components/AdminContext";
 import { ItemActionsProvider } from "./components/ItemActions";
@@ -11,12 +13,16 @@ import { relativeTime } from "./lib/format";
 import Explorer from "./pages/Explorer";
 import Members from "./pages/Members";
 import Manage from "./pages/Manage";
+import Dashboard from "./pages/Dashboard";
+import Rules from "./pages/Rules";
 import NotFound from "./pages/NotFound";
 
-// Later phases add Dashboard and Rules here. `editorOnly` links only show while signed in.
+// `editorOnly` links only show while signed in.
 const NAV = [
   { to: "/", label: "Vault", end: true, editorOnly: false },
+  { to: "/dashboard", label: "Dashboard", end: false, editorOnly: false },
   { to: "/members", label: "Members", end: false, editorOnly: false },
+  { to: "/rules", label: "Rules", end: false, editorOnly: false },
   { to: "/manage", label: "Manage", end: false, editorOnly: true },
 ];
 
@@ -36,12 +42,33 @@ function Nav() {
 }
 
 function Footer() {
-  const { data } = useInventory();
+  const { changes } = useRecent();
+  const newest = changes && changes.length ? changes[0].at : null;
   return (
     <footer className="mt-12 border-t border-[var(--line)] py-6 text-center text-sm text-[var(--muted)]">
       <p>Celestial [Bliss] · ChillSMP</p>
-      {data && <p className="mt-1">Data updated {relativeTime(data.generatedAt)}</p>}
+      <p className="mt-1">Java: <code className="rounded bg-black/30 px-1.5 py-0.5 text-[var(--ink)]">play.chillsmp.org</code> · Bedrock: same address, port <code className="rounded bg-black/30 px-1.5 py-0.5 text-[var(--ink)]">19132</code></p>
+      {newest && <p className="mt-1">Last updated <time dateTime={newest} title={new Date(newest).toLocaleString()}>{relativeTime(newest)}</time></p>}
     </footer>
+  );
+}
+
+/** Routes inside an error boundary; the boundary resets and the page fades in on every navigation. */
+function AppRoutes() {
+  const { pathname } = useLocation();
+  return (
+    <ErrorBoundary resetKey={pathname}>
+      <div key={pathname} className="page-enter">
+        <Routes>
+          <Route path="/" element={<Explorer />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/members" element={<Members />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/manage" element={<Manage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </ErrorBoundary>
   );
 }
 
@@ -55,6 +82,7 @@ export default function App() {
     <ToastProvider>
       <EditorProvider>
         <DataProvider>
+          <RecentProvider>
           <AdminProvider>
             <ItemActionsProvider>
               <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-[var(--gold)] focus:px-3 focus:py-1 focus:text-black">Skip to content</a>
@@ -69,18 +97,14 @@ export default function App() {
                   <Nav />
                 </header>
                 <main id="main">
-                  <Routes>
-                    <Route path="/" element={<Explorer />} />
-                    <Route path="/members" element={<Members />} />
-                    <Route path="/manage" element={<Manage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <AppRoutes />
                 </main>
                 <Footer />
               </div>
               <LoginHost />
             </ItemActionsProvider>
           </AdminProvider>
+          </RecentProvider>
         </DataProvider>
       </EditorProvider>
     </ToastProvider>

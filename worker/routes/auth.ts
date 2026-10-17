@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import type { AppEnv, Env } from "../types";
 import { makeHmac, randomBetween, timingEqual, toHex } from "../crypto";
-import { clearedCookie, createSession, currentEpoch, isEditor, requireEditor, sessionCookie } from "../session";
+import { clearedCookie, createSession, credentialFingerprint, currentEpoch, isEditor, requireEditor, sessionCookie } from "../session";
 import { lockedSeconds, readThrottle, recordFailure } from "../throttle";
 
 export const authRoutes = new Hono<AppEnv>();
@@ -83,7 +83,7 @@ authRoutes.post("/login", async (c) => {
 
   // 6. Success: clear this IP's counter, log it, start the session.
   const epoch = await currentEpoch(env.DB);
-  const token = await createSession(env.JWT_SECRET, epoch);
+  const token = await createSession(env.JWT_SECRET, epoch, await credentialFingerprint(env.JWT_SECRET, env.ADMIN_EMAIL, env.ADMIN_PASSWORD));
   await env.DB.batch([
     env.DB.prepare("DELETE FROM login_throttle WHERE key = ?").bind(ipKey),
     env.DB.prepare("INSERT INTO audit_log (action, entity_type, summary) VALUES ('login', 'session', 'Editor logged in')"),

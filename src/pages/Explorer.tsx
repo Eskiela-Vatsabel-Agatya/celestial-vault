@@ -104,6 +104,7 @@ export default function Explorer() {
 
   return (
     <div>
+      <h2 className="sr-only">Vault inventory</h2>
       <nav aria-label="Categories" className="chips -mx-4 flex gap-2 overflow-x-auto px-4 pb-2">
         <button className="btn shrink-0" aria-pressed={!category} style={!category ? { borderColor: "var(--gold)", color: "var(--gold)" } : undefined} onClick={() => update({ category: null })}>
           All <span className="text-[var(--muted)]">{data.items.length}</span>
