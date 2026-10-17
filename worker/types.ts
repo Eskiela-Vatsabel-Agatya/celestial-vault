@@ -4,6 +4,7 @@ export interface Member {
   id: string; displayName: string; minecraftIgn: string | null; altIgn: string | null;
   guildRank: string; platform: "Java" | "Bedrock" | "Both" | null; kind: "player" | "label";
   isVaultBanned: boolean; notes: string | null;
+  archived: boolean; // true = former member who still owns visible items
 }
 export interface Item {
   id: number; categoryId: string; name: string; setTier: string | null; isMega: boolean;
@@ -11,6 +12,19 @@ export interface Item {
   sortOrder: number; ownerIds: string[];
 }
 export interface Inventory { generatedAt: string; categories: Category[]; members: Member[]; items: Item[] }
+
+// ---- Editor (admin) shapes ----
+export interface AdminItem extends Item { updatedAt: string }
+export interface TrashItem extends AdminItem { archivedAt: string }
+export interface AdminMember extends Member { updatedAt: string; ownedItemCount: number }
+// `version` is a content fingerprint used for optimistic concurrency (categories have no updated_at column).
+export interface AdminCategory extends Category { version: string; itemCount: number }
+export interface AdminData { categories: AdminCategory[]; members: AdminMember[]; items: AdminItem[] }
+export interface AuditEntry {
+  id: number; at: string; actor: string; action: string; entityType: string; entityId: string | null;
+  summary: string; beforeJson: string | null; afterJson: string | null;
+}
+export interface RecentChange { at: string; action: string; entityType: string; summary: string }
 
 // Worker-only bindings. The four secrets are set in the Cloudflare dashboard (type: Secret).
 // Any of them may be undefined if not configured: the code fails closed.

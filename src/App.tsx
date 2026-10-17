@@ -1,19 +1,39 @@
 import { NavLink, Route, Routes } from "react-router-dom";
 import { Star } from "lucide-react";
 import { DataProvider, useInventory } from "./components/DataContext";
-import { relativeTime } from "./lib/format";
 import { EditorProvider, useEditor } from "./components/EditorContext";
+import { AdminProvider } from "./components/AdminContext";
+import { ItemActionsProvider } from "./components/ItemActions";
+import { ToastProvider } from "./components/Toasts";
 import HeaderAuth from "./components/HeaderAuth";
 import LoginModal from "./components/LoginModal";
+import { relativeTime } from "./lib/format";
 import Explorer from "./pages/Explorer";
 import Members from "./pages/Members";
+import Manage from "./pages/Manage";
 import NotFound from "./pages/NotFound";
 
-// Later phases add Dashboard, Rules and Manage here.
+// Later phases add Dashboard and Rules here. `editorOnly` links only show while signed in.
 const NAV = [
-  { to: "/", label: "Vault", end: true },
-  { to: "/members", label: "Members", end: false },
+  { to: "/", label: "Vault", end: true, editorOnly: false },
+  { to: "/members", label: "Members", end: false, editorOnly: false },
+  { to: "/manage", label: "Manage", end: false, editorOnly: true },
 ];
+
+function Nav() {
+  const { editor } = useEditor();
+  return (
+    <nav aria-label="Main" className="flex flex-wrap items-center gap-1">
+      {NAV.filter((n) => !n.editorOnly || editor).map((n) => (
+        <NavLink key={n.to} to={n.to} end={n.end}
+          className={({ isActive }) => `rounded-lg px-3 py-1.5 text-sm ${isActive ? "bg-[var(--gold-soft)] text-[var(--gold)]" : "text-[var(--muted)] hover:text-[var(--ink)]"}`}>
+          {n.label}
+        </NavLink>
+      ))}
+      <HeaderAuth />
+    </nav>
+  );
+}
 
 function Footer() {
   const { data } = useInventory();
@@ -32,38 +52,37 @@ function LoginHost() {
 
 export default function App() {
   return (
-    <EditorProvider>
-    <DataProvider>
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-[var(--gold)] focus:px-3 focus:py-1 focus:text-black">Skip to content</a>
-      <div className="mx-auto max-w-6xl px-4">
-        <header className="flex flex-wrap items-center justify-between gap-3 py-5">
-          <div>
-            <h1 className="font-display flex items-center gap-2 text-3xl" style={{ color: "var(--gold)" }}>
-              <Star size={22} fill="currentColor" aria-hidden="true" /> Celestial Vault
-            </h1>
-            <p className="text-sm text-[var(--muted)]">Everything the guild keeps, and who it belongs to.</p>
-          </div>
-          <nav aria-label="Main" className="flex items-center gap-1">
-            {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} end={n.end}
-                className={({ isActive }) => `rounded-lg px-3 py-1.5 text-sm ${isActive ? "bg-[var(--gold-soft)] text-[var(--gold)]" : "text-[var(--muted)] hover:text-[var(--ink)]"}`}>
-                {n.label}
-              </NavLink>
-            ))}
-            <HeaderAuth />
-          </nav>
-        </header>
-        <main id="main">
-          <Routes>
-            <Route path="/" element={<Explorer />} />
-            <Route path="/members" element={<Members />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-      <LoginHost />
-    </DataProvider>
-    </EditorProvider>
+    <ToastProvider>
+      <EditorProvider>
+        <DataProvider>
+          <AdminProvider>
+            <ItemActionsProvider>
+              <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-[var(--gold)] focus:px-3 focus:py-1 focus:text-black">Skip to content</a>
+              <div className="mx-auto max-w-6xl px-4">
+                <header className="flex flex-wrap items-center justify-between gap-3 py-5">
+                  <div>
+                    <h1 className="font-display flex items-center gap-2 text-3xl" style={{ color: "var(--gold)" }}>
+                      <Star size={22} fill="currentColor" aria-hidden="true" /> Celestial Vault
+                    </h1>
+                    <p className="text-sm text-[var(--muted)]">Everything the guild keeps, and who it belongs to.</p>
+                  </div>
+                  <Nav />
+                </header>
+                <main id="main">
+                  <Routes>
+                    <Route path="/" element={<Explorer />} />
+                    <Route path="/members" element={<Members />} />
+                    <Route path="/manage" element={<Manage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+              <LoginHost />
+            </ItemActionsProvider>
+          </AdminProvider>
+        </DataProvider>
+      </EditorProvider>
+    </ToastProvider>
   );
 }

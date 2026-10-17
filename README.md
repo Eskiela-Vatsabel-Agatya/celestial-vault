@@ -27,3 +27,11 @@ The public `TURNSTILE_SITE_KEY` goes in `wrangler.jsonc` under `vars`.
 
 **Signing everyone out:** use **Sign out everywhere** in the Editor menu, or change the `JWT_SECRET` secret.
 Sessions also expire by themselves after 12 hours.
+
+## Editing (Phase 3)
+Signed-in editors get a **Manage** page (Items, Trash, Categories, Members, Audit log, Backup) plus Add / Edit / Duplicate / Archive buttons on the Vault page.
+- Nothing is ever permanently deleted: items and members are archived and can be restored. Categories can't be removed.
+- Every change writes a readable row to the audit log. Public pages show the last 10 as "recent changes".
+- If two people edit the same record, the second save is refused with a "changed since you opened it" message.
+- Locked entries (`Unknown`, `Guild (shared)`) can't be edited, banned or archived.
+- **Backup:** Manage → Backup → *Download backup*. To restore, give the JSON file to Claude.

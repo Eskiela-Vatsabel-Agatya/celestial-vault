@@ -1,1 +1,3 @@
-export type { Category, Member, Item, Inventory } from "../../worker/types";
+export type {
+  Category, Member, Item, Inventory, AdminItem, AdminMember, AdminCategory, AdminData, TrashItem, AuditEntry, RecentChange,
+} from "../../worker/types";

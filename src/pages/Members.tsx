@@ -51,7 +51,7 @@ export default function Members() {
 
   const counts = new Map<string, number>();
   for (const i of data.items) for (const o of i.ownerIds) counts.set(o, (counts.get(o) ?? 0) + 1);
-  const players = data.members.filter((m) => m.kind === "player").sort(compareMembers);
+  const players = data.members.filter((m) => m.kind === "player" && !m.archived).sort(compareMembers);
   const labels = data.members.filter((m) => m.kind === "label");
 
   return (

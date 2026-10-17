@@ -5,6 +5,8 @@ import { useInventory } from "../components/DataContext";
 import { CategoryIcon } from "../components/icons";
 import { ItemBadges, OwnerChip } from "../components/Badges";
 import ItemDrawer from "../components/ItemDrawer";
+import { useEditor } from "../components/EditorContext";
+import { useItemActions } from "../components/ItemActions";
 import type { Item, Member } from "../lib/types";
 
 const SORTS = ["default", "name", "owners", "quantity"] as const;
@@ -20,6 +22,8 @@ const TOGGLES = [
 
 export default function Explorer() {
   const { data, error, loading, reload } = useInventory();
+  const { editor } = useEditor();
+  const actions = useItemActions();
   const [params, setParams] = useSearchParams();
   const [open, setOpen] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -120,6 +124,7 @@ export default function Explorer() {
           <input id="search" className="field pl-9 pr-9" placeholder="Search item, set, owner or IGN" value={qInput} onChange={(e) => onSearch(e.target.value)} />
           {qInput && <button className="absolute right-2 top-2 rounded p-1 text-[var(--muted)]" aria-label="Clear search" onClick={() => { setQInput(""); update({ q: null }, true); }}><X size={16} /></button>}
         </div>
+        {editor && <button className="btn btn-gold shrink-0" onClick={() => actions.openCreate(category)} disabled={!actions.ready}>+ Add item</button>}
         <button className="btn sm:hidden" aria-expanded={showFilters} aria-controls="filters" onClick={() => setShowFilters((s) => !s)}><SlidersHorizontal size={16} /> Filters</button>
       </div>
 
@@ -201,7 +206,12 @@ export default function Explorer() {
         </>
       )}
 
-      {openItem && <ItemDrawer item={openItem} category={catMap.get(openItem.categoryId)} members={memberMap} onClose={() => setOpen(null)} />}
+      {openItem && <ItemDrawer item={openItem} category={catMap.get(openItem.categoryId)} members={memberMap} onClose={() => setOpen(null)}
+        {...(editor ? {
+          onEdit: () => { setOpen(null); actions.openEdit(openItem.id); },
+          onDuplicate: () => { setOpen(null); actions.openDuplicate(openItem.id); },
+          onArchive: () => { setOpen(null); actions.askArchive(openItem.id); },
+        } : {})} />}
     </div>
   );
 }

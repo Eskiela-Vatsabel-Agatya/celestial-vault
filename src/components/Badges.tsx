@@ -17,7 +17,7 @@ export function OwnerChip({ member }: { member: Member }) {
   const c = label ? "#9aa3c7" : memberColor(member.id);
   return (
     <span className="badge" style={{ color: c, borderColor: `${c}66`, background: `${c}1a`, fontStyle: label ? "italic" : "normal" }}>
-      {member.displayName}
+      {member.displayName}{member.archived ? " (former)" : ""}
     </span>
   );
 }

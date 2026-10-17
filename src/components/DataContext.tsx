@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { fetchInventory } from "../lib/api";
 import type { Inventory } from "../lib/types";
 
-interface State { data: Inventory | null; error: boolean; loading: boolean; reload: () => void }
+interface State { data: Inventory | null; error: boolean; loading: boolean; reload: () => void; refresh: () => Promise<void> }
 const Ctx = createContext<State | null>(null);
 
 export function DataProvider({ children }: { children: ReactNode }) {
@@ -22,7 +22,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [tick]);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);
-  return <Ctx.Provider value={{ data, error, loading, reload }}>{children}</Ctx.Provider>;
+  // Silent refresh after an edit: bypasses the browser's 30-second cache, no loading flash.
+  const refresh = useCallback(async () => { try { setData(await fetchInventory(true)); } catch { /* keep showing the old data */ } }, []);
+  return <Ctx.Provider value={{ data, error, loading, reload, refresh }}>{children}</Ctx.Provider>;
 }
 
 export function useInventory(): State {

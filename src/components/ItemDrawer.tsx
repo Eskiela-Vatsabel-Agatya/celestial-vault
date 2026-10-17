@@ -4,9 +4,9 @@ import type { Category, Item, Member } from "../lib/types";
 import { CategoryIcon } from "./icons";
 import { ItemBadges, OwnerChip } from "./Badges";
 
-interface Props { item: Item; category?: Category; members: Map<string, Member>; onClose: () => void }
+interface Props { item: Item; category?: Category; members: Map<string, Member>; onClose: () => void; onEdit?: () => void; onDuplicate?: () => void; onArchive?: () => void }
 
-export default function ItemDrawer({ item, category, members, onClose }: Props) {
+export default function ItemDrawer({ item, category, members, onClose, onEdit, onDuplicate, onArchive }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -44,6 +44,13 @@ export default function ItemDrawer({ item, category, members, onClose }: Props) 
           <button ref={closeRef} className="btn" onClick={onClose} aria-label="Close details"><X size={16} /></button>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5"><ItemBadges item={item} /></div>
+        {(onEdit || onDuplicate || onArchive) && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {onEdit && <button className="btn btn-gold" onClick={onEdit}>Edit</button>}
+            {onDuplicate && <button className="btn" onClick={onDuplicate}>Duplicate</button>}
+            {onArchive && <button className="btn" onClick={onArchive}>Archive</button>}
+          </div>
+        )}
 
         <dl className="mt-5 grid grid-cols-[7rem_1fr] gap-y-3 text-sm">
           <dt className="text-[var(--muted)]">Category</dt>
