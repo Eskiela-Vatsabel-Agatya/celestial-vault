@@ -1,0 +1,196 @@
+/* ==========================================================================
+   Celestial Vault design tokens
+   Components reference these tokens, never raw hex values.
+   Anchors from the logo: ink #0B0F19, cyan #06B6D4, gold #FACC15.
+   Every neutral is tinted toward the cyan hue (no pure black, no pure white).
+   ========================================================================== */
+
+/* ---- Tailwind theme overrides: enforce the type scale everywhere ---------- */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+
+  /* Exactly six sizes: 12, 14, 16, 20, 24, 28 */
+  --text-xs: 0.75rem;   --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;    --text-base--line-height: 1.5rem;
+  --text-lg: 1.25rem;   --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;   --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;   --text-2xl--line-height: 1.75rem;
+  --text-3xl: 1.75rem;  --text-3xl--line-height: 2rem;
+  --text-4xl: 1.75rem;  --text-4xl--line-height: 2rem;
+
+  /* Legacy colour utilities used by pages Round B will restyle: make them theme-aware. */
+  --color-white: var(--text-primary);
+  --color-red-200: var(--danger-text);
+  --color-red-300: var(--danger-text);
+  --color-red-500: var(--danger-edge);
+}
+
+/* ---- Theme-independent tokens -------------------------------------------- */
+:root {
+  /* Spacing: 4px grid */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px; --space-5: 20px;
+  --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* Radii: concentric. Pill only for the switch and tiny count badges. */
+  --r-outer: 16px;   /* cards, drawer, modal, popover */
+  --r-control: 12px; /* buttons, inputs, selects */
+  --r-inner: 8px;    /* tags, badges, rows */
+  --r-xs: 4px;       /* checkbox box */
+  --r-pill: 999px;
+
+  --container: 1152px;
+  --control-h: 40px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-fast: 120ms;
+  --dur-pop: 160ms;
+  --dur-drawer: 180ms;
+  --anim-pop: pop-in;
+  --anim-drawer: drawer-in;
+  --anim-fade: fade-in;
+  --anim-toast: toast-in;
+
+  /* Cyan: the single brand colour, full ramp */
+  --cyan-50: #ecfcff;  --cyan-100: #d1f4fa; --cyan-200: #a6e9f4; --cyan-300: #6fdcee; --cyan-400: #2fcbe7;
+  --cyan-500: #06b6d4; --cyan-600: #0894b0; --cyan-700: #0b6a83; --cyan-800: #0f5a6f; --cyan-900: #114a5b;
+  --cyan-950: #082e3a;
+
+  /* Gold: small highlight ramp (MEGA, Owner/Co-Owner, logo moments only) */
+  --gold-100: #fcf3c4; --gold-300: #f2d86b; --gold-500: #facc15; --gold-700: #a8730a; --gold-900: #6b4208;
+}
+
+/* ---- Light theme (default) ------------------------------------------------ */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-page: #e3ecf0;
+  --bg-raised: #e8f0f3;
+  --bg-raised-hover: #edf4f6;
+  --bg-overlay: #eff5f7;
+  --bg-inset: #dbe5ea;
+  --bg-hover: #d8e3e9;
+  --hairline: #c3d1d8;
+  --scrim: rgba(14, 26, 33, 0.45);
+
+  --text-primary: #0e1a21;
+  --text-secondary: #34505e;
+  --text-muted: #4a6270;
+  --text-disabled: #7f949f;
+
+  --control-edge: #668190;
+  --control-edge-hover: #4f6a79;
+  --btn-edge: transparent;
+
+  --accent: var(--cyan-500);
+  --accent-hover: var(--cyan-400);
+  --accent-press: var(--cyan-600);
+  --on-accent: #04232b;
+  --accent-text: var(--cyan-700);
+  --accent-tint: #d3ecf1;
+  --focus: var(--cyan-700);
+
+  --gold-bg: var(--gold-100);
+  --gold-text: var(--gold-900);
+  --gold-logo: var(--gold-500);
+
+  --danger-text: #a31f1f;
+  --danger-bg: #f4d9d9;
+  --danger-fill: #b42323;
+  --danger-fill-hover: #9a1c1c;
+  --danger-edge: #b42323;
+  --on-danger: #fbeeee;
+  --success-text: #17603a;
+  --success-dot: #2f9e62;
+
+  --tag-bg: #d5e1e7;
+  --code-bg: #d5e1e7;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2334505e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2304232b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+
+  /* Elevation: flat / raised / overlay. Soft dual shadow, low opacity, generous blur. */
+  --sh-raised: 6px 6px 14px rgba(95, 125, 140, 0.26), -6px -6px 14px rgba(250, 253, 254, 0.85);
+  --sh-raised-sm: 3px 3px 8px rgba(95, 125, 140, 0.24), -3px -3px 8px rgba(250, 253, 254, 0.85);
+  --sh-inset: inset 3px 3px 7px rgba(95, 125, 140, 0.26), inset -3px -3px 7px rgba(250, 253, 254, 0.85);
+  --sh-inset-sm: inset 2px 2px 4px rgba(95, 125, 140, 0.24), inset -2px -2px 4px rgba(250, 253, 254, 0.85);
+  --sh-overlay: 0 16px 40px rgba(14, 26, 33, 0.2), 0 2px 8px rgba(14, 26, 33, 0.1);
+
+  /* Legacy member colours (removed in Round B): darker steps so they stay readable on light */
+  --mc-0: #be185d; --mc-1: #1d4ed8; --mc-2: #047857; --mc-3: #b45309; --mc-4: #0e7490; --mc-5: #c2410c;
+  --mc-6: #b91c1c; --mc-7: #4d7c0f; --mc-8: #0f766e; --mc-9: #8a6a00; --mc-10: #475569; --mc-11: #0369a1;
+
+  /* Legacy aliases for pages Round B has not restyled yet (selected/active used to be "gold") */
+  --ink: var(--text-primary);
+  --muted: var(--text-secondary);
+  --line: var(--hairline);
+  --gold: var(--accent-text);
+  --gold-soft: var(--accent-tint);
+}
+
+/* ---- Dark theme: depth from lighter surfaces, no neumorphic shadows ------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #0a1318;
+  --bg-raised: #101c22;
+  --bg-raised-hover: #152730;
+  --bg-overlay: #162830;
+  --bg-inset: #0c161b;
+  --bg-hover: #142329;
+  --hairline: #213239;
+  --scrim: rgba(3, 9, 12, 0.62);
+
+  --text-primary: #e4eff3;
+  --text-secondary: #aabec8;
+  --text-muted: #8aa1ad;
+  --text-disabled: #566a74;
+
+  --control-edge: #587383;
+  --control-edge-hover: #7a95a4;
+  --btn-edge: #26404b;
+
+  --accent-hover: var(--cyan-400);
+  --accent-press: var(--cyan-600);
+  --on-accent: #031c23;
+  --accent-text: #22d3ee;
+  --accent-tint: #10323b;
+  --focus: #22d3ee;
+
+  --gold-bg: #2d2610;
+  --gold-text: #e6cf85;
+
+  --danger-text: #f29a9a;
+  --danger-bg: #3a1c1e;
+  --danger-fill: #b83232;
+  --danger-fill-hover: #cc4040;
+  --danger-edge: #d85a5a;
+  --on-danger: #fff0f0;
+  --success-text: #86d9a6;
+  --success-dot: #4fbf80;
+
+  --tag-bg: #1a2b33;
+  --code-bg: #1a2b33;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aabec8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23031c23' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+
+  --sh-raised: none;
+  --sh-raised-sm: none;
+  --sh-inset: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  --sh-inset-sm: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  --sh-overlay: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+
+  --mc-0: #f48fb1; --mc-1: #8fb4ff; --mc-2: #5ed3a4; --mc-3: #f3b562; --mc-4: #5fd3e6; --mc-5: #f5a26b;
+  --mc-6: #f19999; --mc-7: #b5d96b; --mc-8: #5fd0c3; --mc-9: #e6cf85; --mc-10: #a9b8c4; --mc-11: #74c0f0;
+}
+
+/* Reduced motion: slides and rises become plain fades */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --anim-pop: fade-in;
+    --anim-drawer: fade-in;
+    --anim-toast: fade-in;
+  }
+}

@@ -9,12 +9,12 @@ export function relativeTime(iso: string, now = Date.now()): string {
   return out;
 }
 
-// Stable colour per member id (deterministic hash into a fixed palette).
-const PALETTE = ["#f472b6", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb923c", "#22d3ee", "#f87171", "#a3e635", "#e879f9", "#2dd4bf", "#facc15"];
+// Legacy per-member colour, only used by pages Round B has not restyled yet.
+// Returns a theme-aware CSS variable (--mc-0 .. --mc-11) so the colour stays readable in both themes.
 export function memberColor(id: string): string {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return PALETTE[h % PALETTE.length];
+  return `var(--mc-${h % 12})`;
 }
 
 const RANK_ORDER = ["Owner", "Co-Owner", "Mod", "Member"];

@@ -56,6 +56,7 @@ export default function Members() {
 
   return (
     <div className="space-y-8">
+      <h1 className="sr-only">Members</h1>
       <section aria-labelledby="players-h">
         <h2 id="players-h" className="font-display mb-3 text-2xl">Members <span className="text-base text-[var(--muted)]">({players.length})</span></h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{players.map((m) => <Card key={m.id} m={m} count={counts.get(m.id) ?? 0} />)}</ul>

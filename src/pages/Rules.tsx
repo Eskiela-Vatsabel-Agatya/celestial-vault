@@ -3,13 +3,13 @@ import { ScrollText, Gavel, PackageCheck, PenLine, type LucideIcon } from "lucid
 import { RULES, RULES_TITLE, type RuleIcon } from "../content/rules";
 
 const ICONS: Record<RuleIcon, LucideIcon> = { scroll: ScrollText, gavel: Gavel, package: PackageCheck, pen: PenLine };
-const ACCENT: Record<RuleIcon, string> = { scroll: "#60a5fa", gavel: "#f87171", package: "#34d399", pen: "#f5c453" };
+const ACCENT: Record<RuleIcon, string> = { scroll: "var(--accent-text)", gavel: "var(--danger-text)", package: "var(--success-text)", pen: "var(--gold-text)" };
 
 export default function Rules() {
   useEffect(() => { document.title = "Rules · Celestial Vault"; }, []);
   return (
     <div className="mx-auto max-w-3xl">
-      <h2 className="font-display mb-4 text-2xl tracking-wide">{RULES_TITLE}</h2>
+      <h1 className="font-display mb-4 text-2xl">{RULES_TITLE}</h1>
       <div className="space-y-4">
         {RULES.map((s) => {
           const Icon = ICONS[s.icon], accent = ACCENT[s.icon];

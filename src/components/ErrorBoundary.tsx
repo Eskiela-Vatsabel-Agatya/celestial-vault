@@ -15,11 +15,11 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.failed) return this.props.children;
     return (
-      <div className="panel mx-auto max-w-md p-8 text-center" role="alert">
-        <h2 className="font-display text-2xl">Something broke on this page</h2>
-        <p className="mt-2 text-[var(--muted)]">Nothing was lost. Try reloading, or head back to the vault.</p>
-        <div className="mt-5 flex justify-center gap-2">
-          <button className="btn btn-gold" onClick={() => window.location.reload()}>Reload</button>
+      <div className="empty-state" role="alert">
+        <h1 className="page-title">Something broke on this page</h1>
+        <p className="mt-2 muted">Nothing was lost. Try reloading, or head back to the vault.</p>
+        <div className="mt-6 flex justify-center gap-2">
+          <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>Reload</button>
           <Link className="btn" to="/" onClick={() => this.setState({ failed: false })}>Back to the vault</Link>
         </div>
       </div>

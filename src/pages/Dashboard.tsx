@@ -65,7 +65,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h2 className="sr-only">Dashboard</h2>
+      <h1 className="sr-only">Dashboard</h1>
 
       <section aria-labelledby="kpi-h">
         <h3 id="kpi-h" className="sr-only">Key numbers</h3>
@@ -89,7 +89,7 @@ export default function Dashboard() {
           {st.categories.map(({ category: c, count }) => (
             <li key={c.id}>
               <Link to={`/?category=${encodeURIComponent(c.id)}`} className="block rounded-lg p-1 hover:bg-white/5" aria-label={`${c.name}: ${count} items, ${f1(pct(count, st.uniqueItems))}%. Open in the vault.`}>
-                <div className="mb-1 flex justify-between gap-2 text-sm"><span style={{ color: c.colorHex }}>{c.name}</span><span className="text-[var(--muted)]">{count} items · {f1(pct(count, st.uniqueItems))}%</span></div>
+                <div className="mb-1 flex justify-between gap-2 text-sm"><span>{c.name}</span><span className="text-[var(--muted)]">{count} items · {f1(pct(count, st.uniqueItems))}%</span></div>
                 <Bar value={pct(count, st.uniqueItems)} color={c.colorHex} />
               </Link>
             </li>

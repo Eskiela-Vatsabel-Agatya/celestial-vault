@@ -11,16 +11,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const push = useCallback((kind: Toast["kind"], text: string) => {
     const id = nextId++;
     setToasts((t) => [...t.slice(-3), { id, kind, text }]);
-    window.setTimeout(() => dismiss(id), kind === "error" ? 7000 : 3500);
+    // Confirmations vanish after about 3 seconds; errors stay a little longer so they can be read.
+    window.setTimeout(() => dismiss(id), kind === "error" ? 6000 : 3000);
   }, []);
   return (
     <Ctx.Provider value={push}>
       {children}
-      <div className="fixed bottom-4 left-1/2 z-[60] flex w-[min(92vw,26rem)] -translate-x-1/2 flex-col gap-2" role="status" aria-live="polite">
+      <div className="toast-region" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className="panel flex items-start justify-between gap-3 p-3 text-sm" style={{ background: "#10173a", borderColor: t.kind === "error" ? "rgba(239,68,68,.6)" : "rgba(52,211,153,.5)" }}>
-            <span>{t.text}</span>
-            <button aria-label="Dismiss" className="text-[var(--muted)]" onClick={() => dismiss(t.id)}><X size={14} /></button>
+          <div key={t.id} className={`toast${t.kind === "error" ? " error" : ""}`}>
+            <span className="dot" aria-hidden="true" />
+            <p>{t.text}</p>
+            <button type="button" className="btn btn-ghost btn-sm icon-btn" aria-label="Dismiss" onClick={() => dismiss(t.id)}><X size={16} aria-hidden="true" /></button>
           </div>
         ))}
       </div>

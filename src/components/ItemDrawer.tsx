@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import type { Category, Item, Member } from "../lib/types";
-import { CategoryIcon } from "./icons";
 import { ItemBadges, OwnerChip } from "./Badges";
 
 interface Props { item: Item; category?: Category; members: Map<string, Member>; onClose: () => void; onEdit?: () => void; onDuplicate?: () => void; onArchive?: () => void }
@@ -17,7 +16,7 @@ export default function ItemDrawer({ item, category, members, onClose, onEdit, o
       if (e.key === "Escape") { e.stopPropagation(); onClose(); return; }
       if (e.key !== "Tab" || !ref.current) return;
       // Focus trap: cycle between the first and last focusable element.
-      const f = ref.current.querySelectorAll<HTMLElement>("button, a[href], [tabindex]:not([tabindex='-1'])");
+      const f = ref.current.querySelectorAll<HTMLElement>("button:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])");
       if (!f.length) return;
       const first = f[0], last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -35,46 +34,42 @@ export default function ItemDrawer({ item, category, members, onClose, onEdit, o
   const owners = item.ownerIds.map((id) => members.get(id)).filter((m): m is Member => !!m);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end" role="presentation">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
-      <div ref={ref} role="dialog" aria-modal="true" aria-labelledby="drawer-title"
-        className="panel relative h-full w-full max-w-md overflow-y-auto rounded-none p-5 sm:rounded-l-2xl" style={{ background: "#10173a" }}>
-        <div className="flex items-start justify-between gap-3">
-          <h2 id="drawer-title" className="font-display text-2xl leading-tight">{item.name}</h2>
-          <button ref={closeRef} className="btn" onClick={onClose} aria-label="Close details"><X size={16} /></button>
+    <div className="overlay-root" role="presentation">
+      <div className="scrim" onClick={onClose} aria-hidden="true" />
+      <div ref={ref} role="dialog" aria-modal="true" aria-labelledby="drawer-title" className="drawer">
+        <div className="dialog-head">
+          <h2 id="drawer-title" className="dialog-title">{item.name}</h2>
+          <button ref={closeRef} type="button" className="btn btn-ghost icon-btn" onClick={onClose} aria-label="Close details"><X size={16} aria-hidden="true" /></button>
         </div>
-        <div className="mt-3 flex flex-wrap gap-1.5"><ItemBadges item={item} /></div>
+        <div className="meta-row"><ItemBadges item={item} /></div>
         {(onEdit || onDuplicate || onArchive) && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {onEdit && <button className="btn btn-gold" onClick={onEdit}>Edit</button>}
-            {onDuplicate && <button className="btn" onClick={onDuplicate}>Duplicate</button>}
-            {onArchive && <button className="btn" onClick={onArchive}>Archive</button>}
+            {onEdit && <button type="button" className="btn btn-primary" onClick={onEdit}>Edit</button>}
+            {onDuplicate && <button type="button" className="btn" onClick={onDuplicate}>Duplicate</button>}
+            {onArchive && <button type="button" className="btn btn-ghost-danger" onClick={onArchive}>Archive</button>}
           </div>
         )}
 
-        <dl className="mt-5 grid grid-cols-[7rem_1fr] gap-y-3 text-sm">
-          <dt className="text-[var(--muted)]">Category</dt>
-          <dd className="flex items-center gap-1.5" style={{ color: category?.colorHex }}>
-            <CategoryIcon name={category?.icon ?? null} /> {category?.name ?? "Unknown"}
-          </dd>
-          <dt className="text-[var(--muted)]">Set / tier</dt><dd>{item.setTier ?? "None"}</dd>
-          <dt className="text-[var(--muted)]">Quantity</dt><dd>{item.quantity}</dd>
-          <dt className="text-[var(--muted)]">Level</dt><dd>{item.customLevel ?? "None"}</dd>
+        <dl className="detail-list mt-6">
+          <dt>Category</dt><dd>{category?.name ?? "Unknown"}</dd>
+          <dt>Set / tier</dt><dd>{item.setTier ?? "None"}</dd>
+          <dt>Quantity</dt><dd>{item.quantity}</dd>
+          <dt>Level</dt><dd>{item.customLevel ?? "None"}</dd>
         </dl>
 
-        <h3 className="font-display mt-6 text-lg">Owners ({owners.length})</h3>
-        <ul className="mt-2 space-y-2">
+        <h3 className="section-title">Owners ({owners.length})</h3>
+        <ul className="hair-list">
           {owners.map((m) => (
-            <li key={m.id} className="panel flex flex-wrap items-center justify-between gap-2 p-2.5 text-sm">
+            <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <OwnerChip member={m} />
-              <span className="text-[var(--muted)]">
+              <span className="muted">
                 {m.kind === "label" ? "Not a player" : <>{m.minecraftIgn ?? "IGN not set"}{m.platform ? ` · ${m.platform}` : ""}</>}
               </span>
             </li>
           ))}
         </ul>
 
-        {item.notes && (<><h3 className="font-display mt-6 text-lg">Notes</h3><p className="mt-1 whitespace-pre-wrap text-sm text-[var(--muted)]">{item.notes}</p></>)}
+        {item.notes && (<><h3 className="section-title">Notes</h3><p className="whitespace-pre-wrap text-sm" style={{ color: "var(--text-secondary)" }}>{item.notes}</p></>)}
       </div>
     </div>
   );
