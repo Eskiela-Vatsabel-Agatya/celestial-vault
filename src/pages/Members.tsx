@@ -1,44 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Copy, Check, Ban } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useInventory } from "../components/DataContext";
-import { compareMembers, memberColor } from "../lib/format";
+import { useToast } from "../components/Toasts";
+import { compareMembers } from "../lib/format";
 import type { Member } from "../lib/types";
 
 function CopyIgn({ ign }: { ign: string }) {
-  const [done, setDone] = useState(false);
+  const toast = useToast();
   async function copy() {
-    try { await navigator.clipboard.writeText(ign); setDone(true); window.setTimeout(() => setDone(false), 1500); } catch { /* clipboard blocked: ignore */ }
+    try { await navigator.clipboard.writeText(ign); toast("ok", `Copied ${ign}`); }
+    catch { toast("error", "Couldn't copy. Select the name and copy it by hand."); }
   }
   return (
-    <button className="btn px-2 py-1" onClick={copy} aria-label={`Copy ${ign}`}>
-      {done ? <Check size={14} /> : <Copy size={14} />}<span className="text-xs">{done ? "Copied" : "Copy"}</span>
+    <button type="button" className="btn btn-primary btn-sm" onClick={copy} aria-label={`Copy ${ign}`}>
+      <Copy size={16} aria-hidden="true" /> Copy
     </button>
   );
 }
 
-function Card({ m, count }: { m: Member; count: number }) {
-  const label = m.kind === "label";
-  const c = label ? "#9aa3c7" : memberColor(m.id);
+function PlayerCard({ m, count }: { m: Member; count: number }) {
+  const goldRank = m.guildRank === "Owner" || m.guildRank === "Co-Owner";
   return (
-    <li className="panel flex flex-col gap-2 p-4" style={{ borderTop: `3px solid ${c}` }}>
+    <li className="member-card card-raised">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-display text-xl">{m.displayName}</h3>
-        {!label && <span className="badge badge-gold">{m.guildRank}</span>}
-        {m.platform && !label && <span className="badge">{m.platform}</span>}
-        {m.isVaultBanned && <span className="badge badge-red"><Ban size={12} className="mr-1" aria-hidden="true" />Vault banned</span>}
+        <h2 className="member-name">{m.displayName}</h2>
+        <span className={goldRank ? "tag badge-gold" : "tag"}>{m.guildRank}</span>
+        {m.isVaultBanned && <span className="tag badge-red">Vault banned</span>}
       </div>
-      {!label && (
-        <div className="text-sm">
-          {m.minecraftIgn ? (
-            <div className="flex flex-wrap items-center gap-2"><code className="rounded bg-black/30 px-1.5 py-0.5">{m.minecraftIgn}</code><CopyIgn ign={m.minecraftIgn} /></div>
-          ) : <span className="text-[var(--muted)]">IGN not set</span>}
-          {m.altIgn && <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[var(--muted)]">Alt: <code className="rounded bg-black/30 px-1.5 py-0.5 text-[var(--ink)]">{m.altIgn}</code><CopyIgn ign={m.altIgn} /></div>}
-        </div>
-      )}
-      <p className="text-sm text-[var(--muted)]">{count} {count === 1 ? "item" : "items"}</p>
-      {m.notes && <p className="text-sm text-[var(--muted)]">{m.notes}</p>}
-      <Link className="btn mt-auto w-fit" to={`/?owners=${encodeURIComponent(m.id)}`}>View items</Link>
+      {m.platform && <p className="meta">{m.platform}</p>}
+      <div>
+        {m.minecraftIgn ? (
+          <div className="ign-row"><code className="code-tag">{m.minecraftIgn}</code><CopyIgn ign={m.minecraftIgn} /></div>
+        ) : <p className="muted text-sm">IGN not set</p>}
+        {m.altIgn && <div className="ign-row" style={{ marginTop: "var(--space-2)" }}><span className="muted">Alt</span><code className="code-tag">{m.altIgn}</code><CopyIgn ign={m.altIgn} /></div>}
+      </div>
+      <p className="muted text-sm">{count} {count === 1 ? "item" : "items"}</p>
+      {m.notes && <p className="muted text-sm">{m.notes}</p>}
+      <Link className="link-btn" style={{ marginTop: "auto", alignSelf: "flex-start", marginLeft: "calc(var(--space-2) * -1)" }} to={`/?owners=${encodeURIComponent(m.id)}`}>View items</Link>
     </li>
   );
 }
@@ -46,8 +45,10 @@ function Card({ m, count }: { m: Member; count: number }) {
 export default function Members() {
   const { data, error, loading, reload } = useInventory();
   useEffect(() => { document.title = "Members · Celestial Vault"; }, []);
-  if (loading && !data) return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">{Array.from({ length: 6 }, (_, i) => <div key={i} className="skeleton h-40" />)}</div>;
-  if (error || !data) return <div className="panel p-8 text-center" role="alert"><p className="font-display text-xl">Couldn't load members.</p><button className="btn btn-gold mt-4" onClick={reload}>Retry</button></div>;
+  const title = (n?: number) => <div className="page-head"><h1 className="page-title">Members{n != null && <span className="muted" style={{ fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 500, letterSpacing: 0 }}> ({n})</span>}</h1></div>;
+
+  if (loading && !data) return <div aria-busy="true">{title()}<div className="members-grid">{Array.from({ length: 6 }, (_, i) => <div key={i} className="placeholder-block" style={{ height: 176 }} />)}</div></div>;
+  if (error || !data) return <div>{title()}<div className="empty-state" role="alert"><p className="text-lg font-semibold">Couldn't load members.</p><button type="button" className="btn btn-primary mt-6" onClick={reload}>Retry</button></div></div>;
 
   const counts = new Map<string, number>();
   for (const i of data.items) for (const o of i.ownerIds) counts.set(o, (counts.get(o) ?? 0) + 1);
@@ -55,15 +56,21 @@ export default function Members() {
   const labels = data.members.filter((m) => m.kind === "label");
 
   return (
-    <div className="space-y-8">
-      <h1 className="sr-only">Members</h1>
-      <section aria-labelledby="players-h">
-        <h2 id="players-h" className="font-display mb-3 text-2xl">Members <span className="text-base text-[var(--muted)]">({players.length})</span></h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{players.map((m) => <Card key={m.id} m={m} count={counts.get(m.id) ?? 0} />)}</ul>
-      </section>
-      <section aria-labelledby="labels-h">
-        <h2 id="labels-h" className="font-display mb-3 text-2xl">Shared &amp; unassigned</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{labels.map((m) => <Card key={m.id} m={m} count={counts.get(m.id) ?? 0} />)}</ul>
+    <div>
+      {title(players.length)}
+      <ul className="members-grid" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {players.map((m) => <PlayerCard key={m.id} m={m} count={counts.get(m.id) ?? 0} />)}
+      </ul>
+      <section className="section" aria-labelledby="labels-h">
+        <h2 id="labels-h" className="section-h">Shared &amp; unassigned</h2>
+        <ul className="flat-list">
+          {labels.map((m) => (
+            <li key={m.id}>
+              <span className="muted" style={{ fontStyle: "italic" }}>{m.displayName}</span>
+              <span className="flex items-center gap-4"><span className="muted">{counts.get(m.id) ?? 0} items</span><Link className="link-btn" to={`/?owners=${encodeURIComponent(m.id)}`}>View items</Link></span>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

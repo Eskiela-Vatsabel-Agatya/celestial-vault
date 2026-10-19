@@ -59,6 +59,7 @@ The public `TURNSTILE_SITE_KEY` goes in `wrangler.jsonc` under `vars`.
 ## Design system
 - **Themes:** light by default (soft neumorphism), plus a dark theme (lighter surfaces, no neumorphic shadows). The toggle in the header saves the choice in the browser (`cv-theme`). The system colour scheme is ignored on purpose.
 - **Where things live:** `src/styles/tokens.css` (colours, type scale, spacing, radii, shadows, motion), `src/styles/base.css`, `src/styles/components.css` (buttons, inputs, tags, popovers, dialogs, drawer, toasts, tabs). Components use tokens, never raw colours.
-- **Colour roles:** cyan is for actions and selection, gold only for MEGA and rank highlights, red only for destructive actions and bans.
+- **Colour roles:** cyan is for actions and selection. Gold is for MEGA, Owner/Co-Owner ranks, the Filters button and Edit buttons. Red is for Archive, vault bans and errors. Each player has their own colour on owner tags and the Dashboard (assigned alphabetically by member id).
+- **Dashboard motion:** numbers count up and bars and the donut fill in once on load; with reduced motion they appear instantly. Final values are always the exact data.
 - **Fonts:** Plus Jakarta Sans (text, with tabular numbers) and Newsreader (wordmark and page titles), self-hosted latin subsets bundled by the build.
 - **Logo:** `public/favicon.svg` is the logo file unchanged; the PNG icons are rendered from it.

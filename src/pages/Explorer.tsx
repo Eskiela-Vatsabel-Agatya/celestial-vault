@@ -177,7 +177,7 @@ export default function Explorer() {
 
             <div className="tb-fixed tb-half">
               <Popover
-                buttonClassName="btn"
+                buttonClassName="btn btn-gold"
                 label={<><SlidersHorizontal size={16} aria-hidden="true" /> Filters {active.length > 0 && <span className="count-badge" aria-label={`${active.length} active`}>{active.length}</span>}</>}
               >
                 <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 240 }}>

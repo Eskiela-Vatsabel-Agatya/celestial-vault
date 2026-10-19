@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import Modal, { ConfirmDialog } from "./Modal";
 import { OwnerChip } from "./Badges";
 import { ApiError, createItem, patchItem } from "../lib/api";
@@ -103,90 +103,94 @@ export default function ItemForm({ mode, item, initial, categories, members, set
       onConfirm={onClose} onCancel={() => setConfirmDiscard(false)} />;
   }
 
-  const err = (k: string) => errors[k] ? <p id={`err-${k}`} className="mt-1 text-xs text-red-300">{errors[k]}</p> : null;
+  const err = (k: string) => errors[k] ? <p id={`err-${k}`} className="field-error">{errors[k]}</p> : null;
   const title = mode === "edit" ? "Edit item" : mode === "duplicate" ? "Duplicate item" : "Add item";
+  const toggleOwner = (id: string) => set("ownerIds", v.ownerIds.includes(id) ? v.ownerIds.filter((o) => o !== id) : [...v.ownerIds, id]);
 
   return (
     <Modal title={title} onClose={tryClose} wide>
-      <form onSubmit={submit} className="space-y-4" noValidate>
+      <form onSubmit={submit} className="form-stack" noValidate>
         <div>
-          <label htmlFor="f-name" className="mb-1 block text-sm text-[var(--muted)]">Name</label>
+          <label htmlFor="f-name" className="field-label">Name</label>
           <input id="f-name" className="field" value={v.name} maxLength={120} onChange={(e) => onName(e.target.value)} aria-invalid={!!errors.name} aria-describedby={errors.name ? "err-name" : undefined} />
           {err("name")}
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="f-cat" className="mb-1 block text-sm text-[var(--muted)]">Category</label>
-            <select id="f-cat" className="field" value={v.categoryId} onChange={(e) => set("categoryId", e.target.value)}>
+            <label htmlFor="f-cat" className="field-label">Category</label>
+            <select id="f-cat" className="field" value={v.categoryId} onChange={(e) => set("categoryId", e.target.value)} aria-invalid={!!errors.categoryId}>
               <option value="">Choose…</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             {err("categoryId")}
           </div>
           <div>
-            <label htmlFor="f-set" className="mb-1 block text-sm text-[var(--muted)]">Set / tier (optional)</label>
-            <input id="f-set" className="field" list="set-suggestions" value={v.setTier} onChange={(e) => set("setTier", e.target.value)} />
+            <label htmlFor="f-set" className="field-label">Set / tier (optional)</label>
+            <input id="f-set" className="field" list="set-suggestions" value={v.setTier} onChange={(e) => set("setTier", e.target.value)} aria-invalid={!!errors.setTier} />
             <datalist id="set-suggestions">{setSuggestions.map((s) => <option key={s} value={s} />)}</datalist>
             {err("setTier")}
           </div>
           <div>
-            <label htmlFor="f-qty" className="mb-1 block text-sm text-[var(--muted)]">Quantity</label>
-            <input id="f-qty" className="field" type="number" min={1} max={999} value={v.quantity} onChange={(e) => set("quantity", e.target.value)} />
+            <label htmlFor="f-qty" className="field-label">Quantity</label>
+            <input id="f-qty" className="field" type="number" min={1} max={999} value={v.quantity} onChange={(e) => set("quantity", e.target.value)} aria-invalid={!!errors.quantity} />
             {err("quantity")}
           </div>
           <div>
-            <label htmlFor="f-lvl" className="mb-1 block text-sm text-[var(--muted)]">Custom level (optional)</label>
-            <input id="f-lvl" className="field" type="number" min={1} max={99} value={v.customLevel} onChange={(e) => set("customLevel", e.target.value)} />
+            <label htmlFor="f-lvl" className="field-label">Custom level (optional)</label>
+            <input id="f-lvl" className="field" type="number" min={1} max={99} value={v.customLevel} onChange={(e) => set("customLevel", e.target.value)} aria-invalid={!!errors.customLevel} />
             {err("customLevel")}
           </div>
         </div>
-        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-          <label className="flex items-center gap-2"><input type="checkbox" checked={v.isMega} onChange={(e) => { setMegaTouched(true); set("isMega", e.target.checked); }} /> MEGA</label>
-          <label className="flex items-center gap-2"><input type="checkbox" checked={v.isInfinite} onChange={(e) => set("isInfinite", e.target.checked)} /> Infinite</label>
+        <div className="flex flex-wrap gap-x-6">
+          <label className="check-row"><input type="checkbox" className="checkbox" checked={v.isMega} onChange={(e) => { setMegaTouched(true); set("isMega", e.target.checked); }} /> MEGA</label>
+          <label className="check-row"><input type="checkbox" className="checkbox" checked={v.isInfinite} onChange={(e) => set("isInfinite", e.target.checked)} /> Infinite</label>
         </div>
 
-        <fieldset>
-          <legend className="mb-1 text-sm text-[var(--muted)]">Owners (at least one)</legend>
-          <div className="mb-2 flex flex-wrap gap-1.5" aria-live="polite">
-            {v.ownerIds.length === 0 && <span className="text-sm text-[var(--muted)]">None selected</span>}
+        <fieldset style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
+          <legend className="field-label">Owners (at least one)</legend>
+          <div className="tag-row" style={{ marginBottom: "var(--space-2)" }} aria-live="polite">
+            {v.ownerIds.length === 0 && <span className="muted text-sm">None selected</span>}
             {v.ownerIds.map((id) => { const m = memberById.get(id); return m ? (
               <span key={id} className="inline-flex items-center gap-1">
                 <OwnerChip member={m} />
-                <button type="button" className="rounded p-0.5 text-[var(--muted)] hover:text-white" aria-label={`Remove ${m.displayName}`} onClick={() => set("ownerIds", v.ownerIds.filter((o) => o !== id))}><X size={12} /></button>
+                <button type="button" className="tag-remove" aria-label={`Remove ${m.displayName}`} onClick={() => toggleOwner(id)}><X size={12} aria-hidden="true" /></button>
               </span>) : null; })}
           </div>
-          <label htmlFor="f-owner-search" className="sr-only">Search owners</label>
-          <input id="f-owner-search" className="field" placeholder="Search by name or IGN" value={ownerQuery} onChange={(e) => setOwnerQuery(e.target.value)} />
-          <ul className="mt-2 max-h-44 space-y-1 overflow-y-auto" aria-label="Available owners">
-            {options.map((m) => { const on = v.ownerIds.includes(m.id); return (
+          <div className="field-shell" aria-invalid={!!errors.ownerIds}>
+            <Search size={16} aria-hidden="true" />
+            <label htmlFor="f-owner-search" className="sr-only">Search owners</label>
+            <input id="f-owner-search" type="text" placeholder="Search by name or IGN" value={ownerQuery} onChange={(e) => setOwnerQuery(e.target.value)} />
+          </div>
+          <ul className="option-list" aria-label="Available owners">
+            {options.map((m) => (
               <li key={m.id}>
-                <button type="button" aria-pressed={on} onClick={() => set("ownerIds", on ? v.ownerIds.filter((o) => o !== m.id) : [...v.ownerIds, m.id])}
-                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-[var(--line)] px-3 py-1.5 text-left text-sm"
-                  style={on ? { borderColor: "var(--gold)", background: "var(--gold-soft)" } : undefined}>
-                  <span>{m.displayName}{m.archived ? " (former)" : ""}{m.kind === "label" && <span className="text-[var(--muted)]"> · not a player</span>}</span>
-                  <span className="text-xs text-[var(--muted)]">{m.kind === "player" ? (m.minecraftIgn ?? "IGN not set") : ""}{on ? " ✓" : ""}</span>
-                </button>
-              </li>); })}
-            {options.length === 0 && <li className="text-sm text-[var(--muted)]">No matches</li>}
+                <label className="check-row">
+                  <input type="checkbox" className="checkbox" checked={v.ownerIds.includes(m.id)} onChange={() => toggleOwner(m.id)} />
+                  <span className="check-grow" style={m.kind === "label" ? { fontStyle: "italic", color: "var(--text-muted)" } : undefined}>{m.displayName}{m.archived ? " (former)" : ""}{m.kind === "label" ? " · not a player" : ""}</span>
+                  {m.kind === "player" && <span className="label-sm">{m.minecraftIgn ?? "IGN not set"}</span>}
+                </label>
+              </li>
+            ))}
+            {options.length === 0 && <li className="label-sm" style={{ padding: "var(--space-2)" }}>No matches</li>}
           </ul>
           {err("ownerIds")}
         </fieldset>
 
         <div>
-          <label htmlFor="f-notes" className="mb-1 block text-sm text-[var(--muted)]">Notes (optional)</label>
-          <textarea id="f-notes" className="field" rows={3} value={v.notes} onChange={(e) => set("notes", e.target.value)} />
+          <label htmlFor="f-notes" className="field-label">Notes (optional)</label>
+          <textarea id="f-notes" className="field" rows={3} value={v.notes} onChange={(e) => set("notes", e.target.value)} aria-invalid={!!errors.notes} />
           {err("notes")}
         </div>
 
         {serverError && (
-          <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200" role="alert">
+          <div className="alert-danger" role="alert">
             {serverError}
-            {conflict && <button type="button" className="btn ml-3 mt-1" onClick={onReload}>Reload</button>}
+            {conflict && <button type="button" className="btn btn-sm ml-3" onClick={onReload}>Reload</button>}
           </div>
         )}
         <div className="flex justify-end gap-2">
           <button type="button" className="btn" onClick={tryClose} disabled={busy}>Cancel</button>
-          <button type="submit" className="btn btn-gold" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
+          <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save"}</button>
         </div>
       </form>
     </Modal>

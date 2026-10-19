@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Plus, Search } from "lucide-react";
 import { useAdmin } from "../../components/AdminContext";
 import { useItemActions } from "../../components/ItemActions";
 import { ItemBadges, OwnerChip } from "../../components/Badges";
@@ -9,34 +10,42 @@ export default function ItemsTab() {
   const [q, setQ] = useState("");
   const memById = useMemo(() => new Map((admin?.members ?? []).map((m) => [m.id, m])), [admin]);
   const catById = useMemo(() => new Map((admin?.categories ?? []).map((c) => [c.id, c])), [admin]);
-  if (!admin) return <p className="text-[var(--muted)]">Loading…</p>;
+  if (!admin) return <p className="muted">Loading…</p>;
   const needle = q.trim().toLowerCase();
   const rows = admin.items.filter((i) => !needle || `${i.name} ${i.setTier ?? ""} ${catById.get(i.categoryId)?.name ?? ""}`.toLowerCase().includes(needle));
   return (
     <div>
-      <div className="flex gap-2">
-        <div className="flex-1">
+      <div className="toolbar">
+        <div className="field-shell tb-grow">
+          <Search size={16} aria-hidden="true" />
           <label htmlFor="m-search" className="sr-only">Search items</label>
-          <input id="m-search" className="field" placeholder="Search items" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input id="m-search" type="text" placeholder="Search items" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <button className="btn btn-gold" onClick={() => actions.openCreate()}>+ Add item</button>
+        <button type="button" className="btn btn-primary tb-fixed" onClick={() => actions.openCreate()}><Plus size={16} aria-hidden="true" /> Add item</button>
       </div>
-      <p className="mt-3 text-sm text-[var(--muted)]">{rows.length} of {admin.items.length} items</p>
-      <ul className="mt-2 space-y-2">
-        {rows.map((i) => (
-          <li key={i.id} className="panel flex flex-wrap items-center justify-between gap-2 p-3">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-1.5"><span className="font-medium">{i.name}</span><ItemBadges item={{ ...i }} /></div>
-              <div className="mt-1 text-xs text-[var(--muted)]">{catById.get(i.categoryId)?.name}{i.setTier ? ` · ${i.setTier}` : ""}</div>
-              <div className="mt-1 flex flex-wrap gap-1">{i.ownerIds.map((id) => { const m = memById.get(id); return m ? <OwnerChip key={id} member={m} /> : null; })}</div>
-            </div>
-            <div className="flex gap-2">
-              <button className="btn" onClick={() => actions.openEdit(i.id)}>Edit</button>
-              <button className="btn" onClick={() => actions.askArchive(i.id)}>Archive</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <p className="results-summary" style={{ marginTop: "var(--space-4)" }} aria-live="polite">{rows.length} of {admin.items.length} items</p>
+      <div className="table-scroll">
+        <table className="data-table static" style={{ marginTop: "var(--space-2)" }}>
+          <thead><tr><th scope="col">Name</th><th scope="col">Owners</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            {rows.map((i) => (
+              <tr key={i.id}>
+                <td>
+                  <div className="meta-row" style={{ gap: "var(--space-2)" }}><span className="cell-name">{i.name}</span><ItemBadges item={i} /></div>
+                  <div className="cell-sub">{catById.get(i.categoryId)?.name}{i.setTier ? ` · ${i.setTier}` : ""}</div>
+                </td>
+                <td><div className="tag-row">{i.ownerIds.map((id) => { const m = memById.get(id); return m ? <OwnerChip key={id} member={m} /> : null; })}</div></td>
+                <td className="actions-cell">
+                  <div className="row-actions">
+                    <button type="button" className="btn btn-gold btn-sm" onClick={() => actions.openEdit(i.id)} aria-label={`Edit ${i.name}`}>Edit</button>
+                    <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => actions.askArchive(i.id)} aria-label={`Archive ${i.name}`}>Archive</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

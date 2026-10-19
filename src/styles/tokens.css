@@ -20,11 +20,6 @@
   --text-3xl: 1.75rem;  --text-3xl--line-height: 2rem;
   --text-4xl: 1.75rem;  --text-4xl--line-height: 2rem;
 
-  /* Legacy colour utilities used by pages Round B will restyle: make them theme-aware. */
-  --color-white: var(--text-primary);
-  --color-red-200: var(--danger-text);
-  --color-red-300: var(--danger-text);
-  --color-red-500: var(--danger-edge);
 }
 
 /* ---- Theme-independent tokens -------------------------------------------- */
@@ -63,9 +58,23 @@
 }
 
 /* ---- Light theme (default) ------------------------------------------------ */
+/* Owner colours: one per member, tag bg + readable fg + solid for charts */
 :root,
 :root[data-theme="light"] {
   color-scheme: light;
+  --oc-0-bg: #f3cfce; --oc-0-fg: #5b1310; --oc-0-solid: #92201c;
+  --oc-1-bg: #f3ddce; --oc-1-fg: #5b2e10; --oc-1-solid: #924b1c;
+  --oc-2-bg: #e4f0d1; --oc-2-fg: #3c5516; --oc-2-solid: #618925;
+  --oc-3-bg: #d2efdc; --oc-3-fg: #18542e; --oc-3-solid: #28864a;
+  --oc-4-bg: #d0f1ed; --oc-4-fg: #14574e; --oc-4-solid: #228c7e;
+  --oc-5-bg: #cee7f3; --oc-5-fg: #10425b; --oc-5-solid: #1c6a92;
+  --oc-6-bg: #ced9f3; --oc-6-fg: #10275b; --oc-6-solid: #1c3f92;
+  --oc-7-bg: #f2cfe2; --oc-7-fg: #591238; --oc-7-solid: #8f1f5a;
+  --oc-8-bg: #e9e0d8; --oc-8-fg: #463425; --oc-8-solid: #71553c;
+  --oc-9-bg: #e9ead7; --oc-9-fg: #474823; --oc-9-solid: #727439;
+  --oc-10-bg: #dce0e4; --oc-10-fg: #2d363e; --oc-10-solid: #4a5764;
+  --oc-11-bg: #f2d6cf; --oc-11-fg: #592012; --oc-11-solid: #8f351f;
+
 
   --bg-page: #e3ecf0;
   --bg-raised: #e8f0f3;
@@ -93,9 +102,13 @@
   --accent-tint: #d3ecf1;
   --focus: var(--cyan-700);
 
-  --gold-bg: var(--gold-100);
-  --gold-text: var(--gold-900);
-  --gold-logo: var(--gold-500);
+  --gold-fill: #f5c000;
+  --gold-fill-hover: #ffd21f;
+  --gold-fill-press: #e2ae00;
+  --on-gold: #2a1a00;
+  --gold-depth: inset 0 1px 0 rgba(255, 246, 196, 0.7), inset 0 -2px 0 rgba(120, 82, 0, 0.38);
+  --gold-depth-press: inset 0 2px 5px rgba(120, 82, 0, 0.45);
+  --bar-fill: var(--cyan-600);
 
   --danger-text: #a31f1f;
   --danger-bg: #f4d9d9;
@@ -118,21 +131,25 @@
   --sh-inset-sm: inset 2px 2px 4px rgba(95, 125, 140, 0.24), inset -2px -2px 4px rgba(250, 253, 254, 0.85);
   --sh-overlay: 0 16px 40px rgba(14, 26, 33, 0.2), 0 2px 8px rgba(14, 26, 33, 0.1);
 
-  /* Legacy member colours (removed in Round B): darker steps so they stay readable on light */
-  --mc-0: #be185d; --mc-1: #1d4ed8; --mc-2: #047857; --mc-3: #b45309; --mc-4: #0e7490; --mc-5: #c2410c;
-  --mc-6: #b91c1c; --mc-7: #4d7c0f; --mc-8: #0f766e; --mc-9: #8a6a00; --mc-10: #475569; --mc-11: #0369a1;
 
-  /* Legacy aliases for pages Round B has not restyled yet (selected/active used to be "gold") */
-  --ink: var(--text-primary);
-  --muted: var(--text-secondary);
-  --line: var(--hairline);
-  --gold: var(--accent-text);
-  --gold-soft: var(--accent-tint);
 }
 
 /* ---- Dark theme: depth from lighter surfaces, no neumorphic shadows ------- */
 :root[data-theme="dark"] {
   color-scheme: dark;
+  --oc-0-bg: #502221; --oc-0-fg: #f1aaa7; --oc-0-solid: #de625e;
+  --oc-1-bg: #503321; --oc-1-fg: #f1c5a7; --oc-1-solid: #de915e;
+  --oc-2-bg: #3c4c24; --oc-2-fg: #d2ebad; --oc-2-solid: #a9d468;
+  --oc-3-bg: #254b33; --oc-3-fg: #afe9c4; --oc-3-solid: #6bd190;
+  --oc-4-bg: #234d48; --oc-4-fg: #abede4; --oc-4-solid: #65d8c8;
+  --oc-5-bg: #214050; --oc-5-fg: #a7d8f1; --oc-5-solid: #5eb3de;
+  --oc-6-bg: #212f50; --oc-6-fg: #a7bdf1; --oc-6-solid: #5e85de;
+  --oc-7-bg: #4e223a; --oc-7-fg: #efa9ce; --oc-7-solid: #db61a2;
+  --oc-8-bg: #43372d; --oc-8-fg: #ddcbbb; --oc-8-solid: #bb9c81;
+  --oc-9-bg: #43442c; --oc-9-fg: #dddeba; --oc-9-solid: #bcbe7e;
+  --oc-10-bg: #33383d; --oc-10-fg: #c4ccd4; --oc-10-solid: #909eac;
+  --oc-11-bg: #4e2b22; --oc-11-fg: #efb7a9; --oc-11-solid: #db7a61;
+
 
   --bg-page: #0a1318;
   --bg-raised: #101c22;
@@ -159,8 +176,13 @@
   --accent-tint: #10323b;
   --focus: #22d3ee;
 
-  --gold-bg: #2d2610;
-  --gold-text: #e6cf85;
+  --gold-fill: #e8b923;
+  --gold-fill-hover: #f2c94a;
+  --gold-fill-press: #cf9f12;
+  --on-gold: #241800;
+  --gold-depth: inset 0 1px 0 rgba(255, 238, 170, 0.4), inset 0 -2px 0 rgba(70, 45, 0, 0.6);
+  --gold-depth-press: inset 0 2px 5px rgba(60, 38, 0, 0.6);
+  --bar-fill: var(--cyan-400);
 
   --danger-text: #f29a9a;
   --danger-bg: #3a1c1e;
@@ -182,8 +204,6 @@
   --sh-inset-sm: inset 0 2px 4px rgba(0, 0, 0, 0.5);
   --sh-overlay: 0 16px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
 
-  --mc-0: #f48fb1; --mc-1: #8fb4ff; --mc-2: #5ed3a4; --mc-3: #f3b562; --mc-4: #5fd3e6; --mc-5: #f5a26b;
-  --mc-6: #f19999; --mc-7: #b5d96b; --mc-8: #5fd0c3; --mc-9: #e6cf85; --mc-10: #a9b8c4; --mc-11: #74c0f0;
 }
 
 /* Reduced motion: slides and rises become plain fades */

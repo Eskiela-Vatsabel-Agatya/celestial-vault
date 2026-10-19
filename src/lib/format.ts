@@ -9,14 +9,6 @@ export function relativeTime(iso: string, now = Date.now()): string {
   return out;
 }
 
-// Legacy per-member colour, only used by pages Round B has not restyled yet.
-// Returns a theme-aware CSS variable (--mc-0 .. --mc-11) so the colour stays readable in both themes.
-export function memberColor(id: string): string {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  return `var(--mc-${h % 12})`;
-}
-
 const RANK_ORDER = ["Owner", "Co-Owner", "Mod", "Member"];
 export function compareMembers(a: Member, b: Member): number {
   const ra = RANK_ORDER.indexOf(a.guildRank), rb = RANK_ORDER.indexOf(b.guildRank);

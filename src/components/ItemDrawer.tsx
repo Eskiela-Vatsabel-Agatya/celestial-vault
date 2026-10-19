@@ -44,9 +44,9 @@ export default function ItemDrawer({ item, category, members, onClose, onEdit, o
         <div className="meta-row"><ItemBadges item={item} /></div>
         {(onEdit || onDuplicate || onArchive) && (
           <div className="mt-4 flex flex-wrap gap-2">
-            {onEdit && <button type="button" className="btn btn-primary" onClick={onEdit}>Edit</button>}
+            {onEdit && <button type="button" className="btn btn-gold" onClick={onEdit}>Edit</button>}
             {onDuplicate && <button type="button" className="btn" onClick={onDuplicate}>Duplicate</button>}
-            {onArchive && <button type="button" className="btn btn-ghost-danger" onClick={onArchive}>Archive</button>}
+            {onArchive && <button type="button" className="btn btn-outline-danger" onClick={onArchive}>Archive</button>}
           </div>
         )}
 

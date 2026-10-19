@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Lock, Ban } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useAdmin } from "../../components/AdminContext";
 import Modal, { ConfirmDialog } from "../../components/Modal";
 import { ApiError, createMember, patchMember } from "../../lib/api";
@@ -38,17 +38,17 @@ function MemberForm({ m, onClose, onSaved }: { m?: AdminMember; onClose: () => v
   }
   return (
     <Modal title={m ? "Edit member" : "Add member"} onClose={onClose}>
-      <form onSubmit={submit} className="space-y-3" noValidate>
-        <div><label htmlFor="m-name" className="mb-1 block text-sm text-[var(--muted)]">Display name (max 40)</label><input id="m-name" className="field" value={displayName} onChange={(e) => setName(e.target.value)} /></div>
+      <form onSubmit={submit} className="form-stack" noValidate>
+        <div><label htmlFor="m-name" className="field-label">Display name (max 40)</label><input id="m-name" className="field" value={displayName} onChange={(e) => setName(e.target.value)} /></div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label htmlFor="m-rank" className="mb-1 block text-sm text-[var(--muted)]">Rank</label><select id="m-rank" className="field" value={guildRank} onChange={(e) => setRank(e.target.value)}>{RANKS.map((r) => <option key={r}>{r}</option>)}</select></div>
-          <div><label htmlFor="m-plat" className="mb-1 block text-sm text-[var(--muted)]">Platform</label><select id="m-plat" className="field" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}><option value="">Unknown</option>{PLATFORMS.map((p) => <option key={p}>{p}</option>)}</select></div>
+          <div><label htmlFor="m-rank" className="field-label">Rank</label><select id="m-rank" className="field" value={guildRank} onChange={(e) => setRank(e.target.value)}>{RANKS.map((r) => <option key={r}>{r}</option>)}</select></div>
+          <div><label htmlFor="m-plat" className="field-label">Platform</label><select id="m-plat" className="field" value={platform} onChange={(e) => setPlatform(e.target.value as typeof platform)}><option value="">Unknown</option>{PLATFORMS.map((p) => <option key={p}>{p}</option>)}</select></div>
         </div>
-        <div><label htmlFor="m-ign" className="mb-1 block text-sm text-[var(--muted)]">IGN</label><input id="m-ign" className="field" value={minecraftIgn} onChange={(e) => setIgn(e.target.value)} /></div>
-        <div><label htmlFor="m-alt" className="mb-1 block text-sm text-[var(--muted)]">Alt IGN</label><input id="m-alt" className="field" value={altIgn} onChange={(e) => setAlt(e.target.value)} /></div>
-        <div><label htmlFor="m-notes" className="mb-1 block text-sm text-[var(--muted)]">Notes (max 300)</label><textarea id="m-notes" className="field" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
-        {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
-        <div className="flex justify-end gap-2"><button type="button" className="btn" onClick={onClose}>Cancel</button><button className="btn btn-gold" disabled={busy}>{busy ? "Saving…" : "Save"}</button></div>
+        <div><label htmlFor="m-ign" className="field-label">IGN</label><input id="m-ign" className="field" value={minecraftIgn} onChange={(e) => setIgn(e.target.value)} /></div>
+        <div><label htmlFor="m-alt" className="field-label">Alt IGN</label><input id="m-alt" className="field" value={altIgn} onChange={(e) => setAlt(e.target.value)} /></div>
+        <div><label htmlFor="m-notes" className="field-label">Notes (max 300)</label><textarea id="m-notes" className="field" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+        {error && <p role="alert" className="field-error">{error}</p>}
+        <div className="flex justify-end gap-2"><button type="button" className="btn" onClick={onClose}>Cancel</button><button className="btn btn-primary" disabled={busy}>{busy ? "Saving…" : "Save"}</button></div>
       </form>
     </Modal>
   );
@@ -62,7 +62,7 @@ export default function MembersTab() {
   const [form, setForm] = useState<{ m?: AdminMember } | null>(null);
   const [pending, setPending] = useState<Pending>(null);
   const [busy, setBusy] = useState(false);
-  if (!admin) return <p className="text-[var(--muted)]">Loading…</p>;
+  if (!admin) return <p className="muted">Loading…</p>;
   const players = admin.members.filter((m) => m.kind === "player").sort((a, b) => Number(a.archived) - Number(b.archived) || compareMembers(a, b));
   const labels = admin.members.filter((m) => m.kind === "label");
 
@@ -78,37 +78,44 @@ export default function MembersTab() {
 
   return (
     <div>
-      <button className="btn btn-gold" onClick={() => setForm({})}>+ Add member</button>
-      <ul className="mt-3 space-y-2">
-        {players.map((m) => (
-          <li key={m.id} className="panel p-3" style={m.archived ? { opacity: 0.65 } : undefined}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="font-medium">{m.displayName}</span>
-                  <span className="badge badge-gold">{m.guildRank}</span>
-                  {m.platform && <span className="badge">{m.platform}</span>}
-                  {m.isVaultBanned && <span className="badge badge-red"><Ban size={12} className="mr-1" aria-hidden="true" />Vault banned</span>}
-                  {m.archived && <span className="badge">Archived</span>}
-                </div>
-                <div className="mt-1 text-xs text-[var(--muted)]">{m.minecraftIgn ?? "IGN not set"}{m.altIgn ? ` · alt ${m.altIgn}` : ""} · {m.ownedItemCount} items</div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button className="btn" onClick={() => setForm({ m })}>Edit</button>
-                <button className="btn" style={m.isVaultBanned ? undefined : { borderColor: "rgba(239,68,68,.6)", color: "#fca5a5" }}
-                  onClick={() => setPending({ kind: m.isVaultBanned ? "unban" : "ban", m })}>{m.isVaultBanned ? "Lift vault ban" : "Vault ban"}</button>
-                <button className="btn" onClick={() => setPending({ kind: m.archived ? "restore" : "archive", m })}>{m.archived ? "Unarchive" : "Archive"}</button>
-              </div>
-            </div>
-          </li>
-        ))}
-        {labels.map((m) => (
-          <li key={m.id} className="panel flex items-center justify-between gap-2 p-3">
-            <div><span className="font-medium">{m.displayName}</span> <span className="text-xs text-[var(--muted)]">· {m.ownedItemCount} items</span></div>
-            <span className="badge"><Lock size={12} className="mr-1" aria-hidden="true" />Locked</span>
-          </li>
-        ))}
-      </ul>
+      <button type="button" className="btn btn-primary" onClick={() => setForm({})}><Plus size={16} aria-hidden="true" /> Add member</button>
+      <div className="table-scroll">
+        <table className="data-table static" style={{ marginTop: "var(--space-4)" }}>
+          <thead><tr><th scope="col">Member</th><th scope="col">IGN</th><th scope="col" style={{ textAlign: "right" }}>Items</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            {players.map((m) => (
+              <tr key={m.id} style={m.archived ? { opacity: 0.7 } : undefined}>
+                <td>
+                  <div className="meta-row" style={{ gap: "var(--space-2)" }}>
+                    <span className="cell-name">{m.displayName}</span>
+                    <span className={m.guildRank === "Owner" || m.guildRank === "Co-Owner" ? "tag badge-gold" : "tag"}>{m.guildRank}</span>
+                    {m.isVaultBanned && <span className="tag badge-red">Vault banned</span>}
+                    {m.archived && <span className="tag">Archived</span>}
+                  </div>
+                  {m.platform && <div className="cell-sub">{m.platform}</div>}
+                </td>
+                <td className="meta" style={{ whiteSpace: "normal" }}>{m.minecraftIgn ?? "IGN not set"}{m.altIgn ? ` · alt ${m.altIgn}` : ""}</td>
+                <td style={{ textAlign: "right" }}>{m.ownedItemCount}</td>
+                <td className="actions-cell">
+                  <div className="row-actions">
+                    <button type="button" className="btn btn-gold btn-sm" onClick={() => setForm({ m })} aria-label={`Edit ${m.displayName}`}>Edit</button>
+                    <button type="button" className={m.isVaultBanned ? "btn btn-sm" : "btn btn-danger btn-sm"} onClick={() => setPending({ kind: m.isVaultBanned ? "unban" : "ban", m })} aria-label={`${m.isVaultBanned ? "Lift vault ban on" : "Vault ban"} ${m.displayName}`}>{m.isVaultBanned ? "Lift vault ban" : "Vault ban"}</button>
+                    <button type="button" className={m.archived ? "btn btn-sm" : "btn btn-outline-danger btn-sm"} onClick={() => setPending({ kind: m.archived ? "restore" : "archive", m })} aria-label={`${m.archived ? "Unarchive" : "Archive"} ${m.displayName}`}>{m.archived ? "Unarchive" : "Archive"}</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {labels.map((m) => (
+              <tr key={m.id}>
+                <td><span className="cell-name muted" style={{ fontStyle: "italic" }}>{m.displayName}</span></td>
+                <td className="meta">Not a player</td>
+                <td style={{ textAlign: "right" }}>{m.ownedItemCount}</td>
+                <td className="actions-cell"><div className="row-actions"><span className="muted text-sm">Locked</span></div></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {form && <MemberForm key={form.m?.updatedAt ?? "new"} m={form.m} onClose={() => setForm(null)} onSaved={() => { setForm(null); void reloadAll(); }} />}
       {pending && (

@@ -1,13 +1,11 @@
 // The Rules page renders from this file. To change the wording, edit the text here and commit.
 // GENERAL RULES and PENALTIES are the guild's original wording (keep them verbatim).
 // TAKING AN ITEM was rewritten for the website and carries a note saying so.
-
-export type RuleIcon = "scroll" | "gavel" | "package" | "pen";
+// Section titles are shown in sentence case; the bullet and step text below is verbatim.
 
 export interface RuleSection {
   id: string;
   title: string;
-  icon: RuleIcon;
   bullets?: string[];
   steps?: string[];
   text?: string;       // plain paragraph
@@ -15,13 +13,12 @@ export interface RuleSection {
   note?: string;       // italic note
 }
 
-export const RULES_TITLE = "CELESTIAL GUILD: VAULT RULES";
+export const RULES_TITLE = "Celestial Guild: vault rules";
 
 export const RULES: RuleSection[] = [
   {
     id: "general",
-    title: "GENERAL RULES",
-    icon: "scroll",
+    title: "General rules",
     bullets: [
       "Always place a PLACEHOLDER when you take an item from the vault.",
       "Return items in the same or better condition than when borrowed.",
@@ -31,8 +28,7 @@ export const RULES: RuleSection[] = [
   },
   {
     id: "penalties",
-    title: "PENALTIES",
-    icon: "gavel",
+    title: "Penalties",
     bullets: [
       "Missing placeholder = 10,000 per item per day overdue.",
       "Repeat offenders will be PERMANENTLY BANNED from the vault.",
@@ -41,8 +37,7 @@ export const RULES: RuleSection[] = [
   },
   {
     id: "taking",
-    title: "TAKING AN ITEM",
-    icon: "package",
+    title: "Taking an item",
     steps: [
       "Place a physical placeholder in the vault where the item was.",
       "When you return the item, put it back and remove the placeholder.",
@@ -52,8 +47,7 @@ export const RULES: RuleSection[] = [
   },
   {
     id: "website",
-    title: "CHANGING THIS WEBSITE",
-    icon: "pen",
+    title: "Changing this website",
     text: "Only trusted editors can add or change items, owners and members. Ask a guild leader if something is missing or wrong.",
   },
 ];

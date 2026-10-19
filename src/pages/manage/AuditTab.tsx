@@ -23,27 +23,37 @@ export default function AuditTab() {
 
   return (
     <div>
-      {failed && <p role="alert" className="text-red-300">Couldn't load the log. <button className="btn ml-2" onClick={() => load()}>Retry</button></p>}
-      <ul className="space-y-2">
-        {entries.map((e) => (
-          <li key={e.id} className="panel p-3 text-sm">
-            <div className="text-xs text-[var(--muted)]">{localTime(e.at)} · {e.action} · {e.entityType}</div>
-            <div className="mt-0.5">{e.summary}</div>
-            {(e.beforeJson || e.afterJson) && (
-              <details className="mt-1">
-                <summary className="cursor-pointer text-xs text-[var(--gold)]">Before / after</summary>
-                <div className="mt-2 grid gap-2 md:grid-cols-2">
-                  <div><div className="text-xs text-[var(--muted)]">Before</div><pre className="overflow-x-auto rounded bg-black/30 p-2 text-xs">{pretty(e.beforeJson)}</pre></div>
-                  <div><div className="text-xs text-[var(--muted)]">After</div><pre className="overflow-x-auto rounded bg-black/30 p-2 text-xs">{pretty(e.afterJson)}</pre></div>
-                </div>
-              </details>
-            )}
-          </li>
-        ))}
-      </ul>
-      {!loading && !failed && entries.length === 0 && <p className="text-[var(--muted)]">No entries yet.</p>}
-      {loading && <p className="mt-2 text-[var(--muted)]">Loading…</p>}
-      {next && !loading && <button className="btn mt-3" onClick={() => load(next)}>Load more</button>}
+      {failed && <p role="alert" className="text-danger">Couldn't load the log. <button type="button" className="btn btn-sm ml-2" onClick={() => load()}>Retry</button></p>}
+      {entries.length > 0 && (
+        <div className="table-scroll">
+          <table className="data-table static">
+            <thead><tr><th scope="col">Time</th><th scope="col">Action</th><th scope="col">Summary</th></tr></thead>
+            <tbody>
+              {entries.map((e) => (
+                <tr key={e.id}>
+                  <td className="meta" style={{ whiteSpace: "normal" }}>{localTime(e.at)}</td>
+                  <td className="meta" style={{ whiteSpace: "normal" }}>{e.action} · {e.entityType}</td>
+                  <td>
+                    <p style={{ overflowWrap: "anywhere" }}>{e.summary}</p>
+                    {(e.beforeJson || e.afterJson) && (
+                      <details className="mt-1">
+                        <summary className="link-btn" style={{ display: "inline-block", cursor: "pointer", marginLeft: "calc(var(--space-2) * -1)" }}>Before / after</summary>
+                        <div className="mt-2 grid gap-3 md:grid-cols-2">
+                          <div><div className="label-sm">Before</div><pre className="code-block">{pretty(e.beforeJson)}</pre></div>
+                          <div><div className="label-sm">After</div><pre className="code-block">{pretty(e.afterJson)}</pre></div>
+                        </div>
+                      </details>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {!loading && !failed && entries.length === 0 && <p className="muted">No entries yet.</p>}
+      {loading && <p className="mt-2 muted">Loading…</p>}
+      {next && !loading && <button type="button" className="btn mt-4" onClick={() => load(next)}>Load more</button>}
     </div>
   );
 }

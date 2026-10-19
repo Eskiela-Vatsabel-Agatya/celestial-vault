@@ -1,4 +1,5 @@
 import type { Item, Member } from "../lib/types";
+import { ownerColorIndex } from "../lib/ownerColor";
 
 /** MEGA is the only gold item badge. Infinite, level and quantity are plain neutral text. */
 export function ItemBadges({ item }: { item: Item }) {
@@ -12,10 +13,11 @@ export function ItemBadges({ item }: { item: Item }) {
   );
 }
 
-/** One neutral tag style for every member. Labels (Unknown, Guild (shared)) are italic and muted. */
+/** Each player has their own colour (stable across the whole site). Labels (Unknown, Guild (shared)) stay italic and muted. */
 export function OwnerChip({ member }: { member: Member }) {
+  const label = member.kind === "label";
   return (
-    <span className={member.kind === "label" ? "tag tag-label" : "tag"}>
+    <span className={label ? "tag tag-label" : `tag oc oc-${ownerColorIndex(member.id)}`}>
       {member.displayName}{member.archived ? " (former)" : ""}
     </span>
   );

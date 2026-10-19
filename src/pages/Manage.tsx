@@ -27,8 +27,8 @@ export default function Manage() {
   const Active = TABS.find((t) => t.id === tab)!.el;
   return (
     <div>
-      <h1 className="font-display mb-4 text-2xl">Manage the vault</h1>
-      <div role="tablist" aria-label="Manage sections" className="segmented mb-4">
+      <div className="page-head"><h1 className="page-title">Manage the vault</h1></div>
+      <div role="tablist" aria-label="Manage sections" className="segmented" style={{ marginBottom: "var(--space-6)" }}>
         {TABS.map((t) => (
           <button key={t.id} role="tab" id={`tab-${t.id}`} aria-selected={tab === t.id} aria-controls="tab-panel" onClick={() => setTab(t.id)}>{t.label}</button>
         ))}
