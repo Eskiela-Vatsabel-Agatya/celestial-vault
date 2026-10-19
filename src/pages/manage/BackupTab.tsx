@@ -12,7 +12,7 @@ export default function BackupTab() {
   return (
     <section className="prose-page" aria-labelledby="backup-h">
       <h2 id="backup-h" className="section-h">Backup</h2>
-      <p className="mt-2 muted">Downloads everything (items, owners, members, categories, archived rows and the audit log) as one JSON file. To restore, give that file to Claude.</p>
+      <p className="mt-2 muted">Downloads everything (items, owners, members, categories, archived rows and the audit log) as one JSON file. To restore, tell Abell.</p>
       <button type="button" className="btn btn-primary mt-6" onClick={go} disabled={busy}>{busy ? "Preparing…" : "Download backup"}</button>
     </section>
   );
